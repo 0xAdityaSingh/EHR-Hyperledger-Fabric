@@ -42,3 +42,16 @@ node registerUser.js
 node invoke.js
 node query.js
 ```  
+
+
+### Rerun
+
+```
+cd ..
+```
+
+```
+./networkDown.sh
+```
+
+Follow steps from Run
