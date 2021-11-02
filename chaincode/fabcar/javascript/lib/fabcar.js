@@ -96,24 +96,40 @@ class FabCar extends Contract {
     // }
     async read_record(ctx, ID) {
         const carAsBytes = await ctx.stub.getState(ID); // get the car from chaincode state
-        const role1 = await ctx.clientIdentity.getAttributeValue('hf.role')
-        console.log(role1);
+        const role = await ctx.clientIdentity.getAttributeValue('hf.Type')
+        if(role===null){
+            return "Error: Role not found";
+        }
 
-        const role2 = await ctx.clientIdentity.getAttributeValue('role')
-        console.log(role2);
-        if(role1!==null){
-            console.log(role1.toString());
-            }
-        if(role2!==null){
-            console.log(role2.toString());
-            }
-        // console.log(role1.toString());
         if (!carAsBytes || carAsBytes.length === 0) {
             throw new Error(`${ID} does not exist`);
         }
         console.log(carAsBytes.toString());
         console.log(carAsBytes);
         return carAsBytes.toString();
+
+
+        
+        // if(role1!==null && role2!==null){
+        //     return "1." + role1.toString() + role2.toString();
+        // }
+        // if(role1===null && role2!==null){
+        //     return "2." + role2.toString();
+        // }
+        // if(role1!==null && role2===null){
+        //     return "3." + role1.toString();
+        // }
+
+        // const type = await ctx.clientIdentity.getAttributeValue('hf.Type')
+        // if(type!==null){
+        //     return "4." + type.toString();
+        // }
+
+        // const type2 = await ctx.clientIdentity.getAttributeValue('hf.type')
+        // if(type2!==null){
+        //     return "5." + type2.toString();
+        // }
+        // return "role1, role2, type, type2 is null";
     }
     async queryAll(ctx) {
         const startKey = '';
