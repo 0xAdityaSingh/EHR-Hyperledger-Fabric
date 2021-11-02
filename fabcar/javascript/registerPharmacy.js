@@ -49,7 +49,10 @@ async function main() {
         const secret = await ca.register({
             affiliation: 'org1.department1',
             enrollmentID: 'Pharmacy1',
-            role: 'pharmacy'
+            role: 'client'
+            'attributes': [{
+                'role': "pharmacy", 'erect': true
+            }],
         }, adminUser);
         const enrollment = await ca.enroll({
             enrollmentID: 'Pharmacy1',

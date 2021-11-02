@@ -95,41 +95,58 @@ class FabCar extends Contract {
     //     console.info('============= END : Create Car ===========');
     // }
     async read_record(ctx, ID) {
-        const carAsBytes = await ctx.stub.getState(ID); // get the car from chaincode state
-        const role = await ctx.clientIdentity.getAttributeValue('hf.Type')
-        if(role===null){
-            return "Error: Role not found";
+        //return ctx.clientIdentity.getID().toString();
+        // const carAsBytes = await ctx.stub.getState(ID); // get the car from chaincode state
+        // const role = await ctx.clientIdentity.getAttributeValue('hf.Type')
+        // if(role===null){
+        //     return "Error: Role not found";
+        // }
+
+        // if (!carAsBytes || carAsBytes.length === 0) {
+        //     throw new Error(`${ID} does not exist`);
+        // }
+        // console.log(carAsBytes.toString());
+        // console.log(carAsBytes);
+        // return carAsBytes.toString();
+
+
+        // let role_str = role.toString();
+        // let record = JSON.parse(carAsBytes.toString());
+
+        // if(role_str === 'doctor'){
+        //     if(record['allowed'].includes(ctx.clientIdentity.getID())) {
+        //         return record['data'];
+        //     }
+        //     else {
+        //         return "403 Authetication Faliure";
+        //     }
+        // }
+        // if(role_str === 'pharmacy'){
+        //     if(record['type']==='Prescription' && record['allowed'].includes(ctx.clientIdentity.getID())) {
+        //         return record['data'];
+        //     }
+        //     else {
+        //         return "403 Authetication Faliure";
+        //     }
+        // }
+        // return "role not found";
+        const role1 = ctx.clientIdentity.getAttributeValue('Registrar.Roles');
+        const role2 = ctx.clientIdentity.getAttributeValue('hf.Registrar.Roles');
+        if(role1!==null && role2!==null){
+            return "1." + role1.toString() + role2.toString();
+        }
+        if(role1===null && role2!==null){
+            return "2." + role2.toString();
+        }
+        if(role1!==null && role2===null){
+            return "3." + role1.toString();
         }
 
-        if (!carAsBytes || carAsBytes.length === 0) {
-            throw new Error(`${ID} does not exist`);
+        const type = await ctx.clientIdentity.getAttributeValue('hf.Type')
+        if(type!==null){
+            return "4." + type.toString();
         }
-        console.log(carAsBytes.toString());
-        console.log(carAsBytes);
-        return carAsBytes.toString();
-
-
-        
-        // if(role1!==null && role2!==null){
-        //     return "1." + role1.toString() + role2.toString();
-        // }
-        // if(role1===null && role2!==null){
-        //     return "2." + role2.toString();
-        // }
-        // if(role1!==null && role2===null){
-        //     return "3." + role1.toString();
-        // }
-
-        // const type = await ctx.clientIdentity.getAttributeValue('hf.Type')
-        // if(type!==null){
-        //     return "4." + type.toString();
-        // }
-
-        // const type2 = await ctx.clientIdentity.getAttributeValue('hf.type')
-        // if(type2!==null){
-        //     return "5." + type2.toString();
-        // }
-        // return "role1, role2, type, type2 is null";
+        return "role1, role2, type, type2 is null";
     }
     async queryAll(ctx) {
         const startKey = '';

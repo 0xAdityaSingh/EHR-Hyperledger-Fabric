@@ -49,22 +49,23 @@ async function main() {
         const secret = await ca.register({
             affiliation: 'org1.department1',
             enrollmentID: 'appUser',
-            role: 'client'
+            role: 'client',
+            attrs: [
+                {"name": "hf.Registrar.Roles", "value": "pharmacy"}
+            ],
         }, adminUser);
         const enrollment = await ca.enroll({
             enrollmentID: 'appUser',
             enrollmentSecret: secret,
-            role: 'client3'
+            attr_reqs: [{name: 'hf.Registrar.Roles', optional: false}]
         });
         const x509Identity = {
             credentials: {
                 certificate: enrollment.certificate,
                 privateKey: enrollment.key.toBytes(),
-                role: 'client2',
             },
             mspId: 'Org1MSP',
             type: 'X.509',
-            role: 'client1',
         };
         await wallet.put('appUser', x509Identity);
         console.log('Successfully registered and enrolled admin user "appUser" and imported it into the wallet');
