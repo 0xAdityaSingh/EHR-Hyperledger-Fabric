@@ -15,21 +15,21 @@ class FabCar extends Contract {
         const records = [
             {
                 
-                owner: 'Patient1',
+                owner: 'x509::/OU=org1/OU=client/OU=department1/CN=appUser::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server',
                 allowed: ['x509::/OU=org1/OU=client/OU=department1/CN=doctor1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server', 'x509::/OU=org1/OU=client/OU=department1/CN=pharmacy1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server'],
                 type: 'Prescription',
                 data: 'DataID1',
             },
             {
                 
-                owner: 'Patient2',
+                owner: 'x509::/OU=org1/OU=client/OU=department1/CN=appUser1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server',
                 allowed: ['x509::/OU=org1/OU=client/OU=department1/CN=doctor1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server'],
                 type: 'Lab Report',
                 data: 'DataID2',
             },            
             {
                 
-                owner: 'Patient3',
+                owner: 'x509::/OU=org1/OU=client/OU=department1/CN=appUser2::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server',
                 allowed: ['x509::/OU=org1/OU=client/OU=department1/CN=doctor2::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server'],
                 type: 'Prescription',
                 data: 'DataID3',
@@ -94,17 +94,95 @@ class FabCar extends Contract {
     //     await ctx.stub.putState(carNumber, Buffer.from(JSON.stringify(car)));
     //     console.info('============= END : Create Car ===========');
     // }
-    async read_record(ctx, ID) {
-        // return ctx.clientIdentity.getID().toString();
+    async grant_permission(ctx,ID,UID){
         const carAsBytes = await ctx.stub.getState(ID); // get the car from chaincode state
         const role = await ctx.clientIdentity.getAttributeValue('hf.Registrar.Roles')
         if(role===null){
             return "Error: Role not found";
         }
         let role_str = role.toString();
-        // return role_str+ " ...... "+ ctx.clientIdentity.getID();
+        let record=JSON.parse(carAsBytes.toString());
+        if(role_str === 'patient'){
+            if(record['owner']===ctx.clientIdentity.getID()){
+                if(record['allowed'].includes(UID)){
+                    return "Permission Already Granted";
+                }
+                else{
+                    record['allowed'].push(UID);
+                    // record.data='Updated_DataID1';
+                    await ctx.stub.putState(ID, Buffer.from(JSON.stringify(record)));
+                    return "Permission Granted";
+                }
+            }
+            else {
+                return "403 Authetication Faliure";
+                
+            }
+        }
+    }
+    async revoke_permission(ctx,ID,UID){
+        const carAsBytes = await ctx.stub.getState(ID); // get the car from chaincode state
+        const role = await ctx.clientIdentity.getAttributeValue('hf.Registrar.Roles')
+        if(role===null){
+            return "Error: Role not found";
+        }
+        let role_str = role.toString();
+        let record=JSON.parse(carAsBytes.toString());
+        if(role_str === 'patient'){
+            if(record['owner']===ctx.clientIdentity.getID()){
+                if(record['allowed'].includes(UID)){
+                    record['allowed'].splice(record['allowed'].indexOf(UID));
+                    await ctx.stub.putState(ID, Buffer.from(JSON.stringify(record)));
+                    return "Permission Revoked";
+                }
+                else{
+                    
+                    return "Haven't Given any Permission";
+                }
+            }
+            else {
+                return "403 Authetication Faliure";
+                
+            }
+        }
+    }
+    async update_data(ctx,ID,updated_string){
+        const carAsBytes = await ctx.stub.getState(ID); // get the car from chaincode state
+        const role = await ctx.clientIdentity.getAttributeValue('hf.Registrar.Roles')
+        if(role===null){
+            return "Error: Role not found";
+        }
+        let role_str = role.toString();
+        let record=JSON.parse(carAsBytes.toString());
+        if(role_str === 'doctor'){
+            if(record['allowed'].includes(ctx.clientIdentity.getID())){
+                record.data=updated_string;
+                await ctx.stub.putState(ID, Buffer.from(JSON.stringify(record)));
+                return "New Data: "+record.data;
+            }
+            else{
+                return "Require Permission to Update";
+            }
+            }
+        }
+    
+    
+    async read_record(ctx, ID) {
+        const carAsBytes = await ctx.stub.getState(ID); // get the car from chaincode state
+        const role = await ctx.clientIdentity.getAttributeValue('hf.Registrar.Roles')
+        if(role===null){
+            return "Error: Role not found";
+        }
+        let role_str = role.toString();
         let record = JSON.parse(carAsBytes.toString());
-
+        if(role_str === 'patient'){
+            if(record['owner']===ctx.clientIdentity.getID()){
+                return record['data'];
+            }
+            else {
+                return "403 Authetication Faliure";
+            }
+        }
         if(role_str === 'doctor'){
             if(record['allowed'].includes(ctx.clientIdentity.getID())) {
                 return record['data'];
