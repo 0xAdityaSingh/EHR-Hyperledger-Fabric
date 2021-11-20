@@ -23,7 +23,7 @@ class FabCar extends Contract {
             {
                 
                 owner: 'x509::/OU=org1/OU=client/OU=department1/CN=appUser1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server',
-                allowed: ['x509::/OU=org1/OU=client/OU=department1/CN=doctor1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server'],
+                allowed: ['x509::/OU=org1/OU=client/OU=department1/CN=doctor1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server','x509::/OU=org1/OU=client/OU=department1/CN=diagnostic_lab1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server'],
                 type: 'Lab Report',
                 data: 'DataID2',
             },            
@@ -119,6 +119,9 @@ class FabCar extends Contract {
                 
             }
         }
+        else{
+            return "Not Allowed";
+        }
     }
     async revoke_permission(ctx,ID,UID){
         const carAsBytes = await ctx.stub.getState(ID); // get the car from chaincode state
@@ -145,6 +148,9 @@ class FabCar extends Contract {
                 
             }
         }
+        else{
+            return "Not Allowed";
+        }
     }
     async update_data(ctx,ID,updated_string){
         const carAsBytes = await ctx.stub.getState(ID); // get the car from chaincode state
@@ -163,6 +169,19 @@ class FabCar extends Contract {
             else{
                 return "Require Permission to Update";
             }
+            }
+            if(role_str === 'diagnostic lab'){
+                if(record['allowed'].includes(ctx.clientIdentity.getID()) && record['type']==='Lab Report'){
+                    record.data=updated_string;
+                    await ctx.stub.putState(ID, Buffer.from(JSON.stringify(record)));
+                    return "New Data: "+record.data;
+                }
+                else{
+                    return "Require Permission to Update";
+                }
+            }
+            else {
+                return "403 Authetication Faliure";
             }
         }
     
@@ -193,6 +212,14 @@ class FabCar extends Contract {
         }
         if(role_str === 'pharmacy'){
             if(record['type']==='Prescription' && record['allowed'].includes(ctx.clientIdentity.getID())) {
+                return record['data'];
+            }
+            else {
+                return "403 Authetication Faliure";
+            }
+        }
+        if(role_str === 'diagnostic lab'){
+            if(record['type']==='Lab Report' && record['allowed'].includes(ctx.clientIdentity.getID())){
                 return record['data'];
             }
             else {
@@ -261,115 +288,3 @@ class FabCar extends Contract {
 }
 
 module.exports = FabCar;
-
-
-// 'use strict';
-
-// const { Contract } = require('fabric-contract-api');
-
-// class FabCar extends Contract {
-
-//     async initLedger(ctx) {
-//         console.info('============= START : Initialize Ledger ===========');
-//         const records = [
-//             {
-                
-//                 owner: 'Patient1',
-//                 allowed: ['Doctor1', 'Pharmacy1'],
-//                 type: 'Prescription',
-//                 data: 'DataID1',
-//             },
-//             {
-                
-//                 owner: 'Patient1',
-//                 allowed: ['Doctor1'],
-//                 type: 'Lab Report',
-//                 data: 'DataID2',
-//             },            
-//             {
-                
-//                 owner: 'Patient2',
-//                 allowed: ['Doctor1'],
-//                 type: 'Prescription',
-//                 data: 'DataID3',
-//             },
-//         ];
-
-//         for (let i = 0; i < records.length; i++) {
-//             records[i].docType = 'record';
-//             await ctx.stub.putState('RECORD' + i, Buffer.from(JSON.stringify(records[i])));
-//             console.info('Added <--> ', records[i]);
-//         }
-//         console.info('============= END : Initialize Ledger ===========');
-//     }
-
-    
-
-//     // -------------------------------------------------------------
-
-//     async queryCar(ctx, carNumber) {
-//         const carAsBytes = await ctx.stub.getState(carNumber); // get the car from chaincode state
-//         if (!carAsBytes || carAsBytes.length === 0) {
-//             throw new Error(`${carNumber} does not exist`);
-//         }
-//         console.log(carAsBytes.toString());
-//         console.log(carAsBytes);
-//         return carAsBytes.toString();
-//     }
-
-
-
-//     async createCar(ctx, carNumber, owner, allowed,  type, data) {
-//         console.info('============= START : Create Car ===========');
-
-//         const record = {
-            
-//             docType: 'records',
-//             owner,
-//             allowed,
-//             type,
-//             data
-//         };
-
-//         await ctx.stub.putState(carNumber, Buffer.from(JSON.stringify(car)));
-//         console.info('============= END : Create Car ===========');
-//     }
-//     async queryAll(ctx) {
-//         const startKey = '';
-//         const endKey = '';
-//         const allResults = [];
-//         for await (const {key, value} of ctx.stub.getStateByRange(startKey, endKey)) {
-//             const strValue = Buffer.from(value).toString('utf8');
-//             let record;
-//             try {
-//                 record = JSON.parse(strValue);
-//             } catch (err) {
-//                 console.log(err);
-//                 record = strValue;
-//             }
-//             allResults.push({ Key: key, Record: record });
-            
-//         }
-//         console.info(allResults);
-//         return JSON.stringify(allResults);
-//     }
-    
-
-
-//     async changeCarOwner(ctx, carNumber, newOwner) {
-//         console.info('============= START : changeCarOwner ===========');
-
-//         const carAsBytes = await ctx.stub.getState(carNumber); // get the car from chaincode state
-//         if (!carAsBytes || carAsBytes.length === 0) {
-//             throw new Error(`${carNumber} does not exist`);
-//         }
-//         const car = JSON.parse(carAsBytes.toString());
-//         car.owner = newOwner;
-
-//         await ctx.stub.putState(carNumber, Buffer.from(JSON.stringify(car)));
-//         console.info('============= END : changeCarOwner ===========');
-//     }
-
-// }
-
-// module.exports = FabCar;

@@ -39,11 +39,7 @@ async function main() {
         // Get the contract from the network.
         const contract = network.getContract('fabcar');
 
-        // Submit the specified transaction.
-        // createCar transaction - requires 5 argument, ex: ('createCar', 'CAR12', 'Honda', 'Accord', 'Black', 'Tom')
-        // changeCarOwner transaction - requires 2 args , ex: ('changeCarOwner', 'CAR12', 'Dave')
-        // await contract.submitTransaction('createCar','RECORD47', 'Patient47', ['Doctor1'], 'Prescription', 'DataID47');
-        // console.log('Transaction has been submitted');
+        
         const result3 = await contract.submitTransaction('grant_permission', 'RECORD0','x509::/OU=org1/OU=client/OU=department1/CN=doctor1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server');
         console.log(`Transaction has been evaluated, result is: ${result3.toString()}`);
         const result4 = await contract.submitTransaction('grant_permission', 'RECORD0','x509::/OU=org1/OU=client/OU=department1/CN=doctor2::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server');
