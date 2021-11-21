@@ -16,7 +16,7 @@ class FabCar extends Contract {
             {
                 
                 owner: 'x509::/OU=org1/OU=client/OU=department1/CN=appUser::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server',
-                allowed: ['x509::/OU=org1/OU=client/OU=department1/CN=doctor1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server', 'x509::/OU=org1/OU=client/OU=department1/CN=pharmacy1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server'],
+                allowed: ['x509::/OU=org1/OU=client/OU=department1/CN=doctor1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server', 'x509::/OU=org1/OU=client/OU=department1/CN=pharmacy1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server','x509::/OU=org1/OU=client/OU=department1/CN=insurance1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server'],
                 type: 'Prescription',
                 data: 'DataID1',
             },
@@ -80,20 +80,7 @@ class FabCar extends Contract {
         await ctx.stub.putState(ID, Buffer.from(JSON.stringify(record)));
         console.info('============= END : Create Car ===========');
     }
-    // async createCar(ctx, carNumber, role, name,  owner) {
-    //     console.info('============= START : Create Car ===========');
-
-    //     const car = {
-            
-    //         docType: 'car',
-    //         role,
-    //         name,
-    //         owner,
-    //     };
-
-    //     await ctx.stub.putState(carNumber, Buffer.from(JSON.stringify(car)));
-    //     console.info('============= END : Create Car ===========');
-    // }
+   
     async grant_permission(ctx,ID,UID){
         const carAsBytes = await ctx.stub.getState(ID); // get the car from chaincode state
         const role = await ctx.clientIdentity.getAttributeValue('hf.Registrar.Roles')
@@ -196,6 +183,14 @@ class FabCar extends Contract {
         let record = JSON.parse(carAsBytes.toString());
         if(role_str === 'patient'){
             if(record['owner']===ctx.clientIdentity.getID()){
+                return record['data'];
+            }
+            else {
+                return "403 Authetication Faliure";
+            }
+        }
+        if(role_str === 'insurance'){
+            if(record['allowed'].includes(ctx.clientIdentity.getID())) {
                 return record['data'];
             }
             else {
