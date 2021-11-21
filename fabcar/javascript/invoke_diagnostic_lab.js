@@ -38,11 +38,14 @@ async function main() {
 
         // Get the contract from the network.
         const contract = network.getContract('fabcar');
-
-        const result0 = await contract.submitTransaction('update_data', 'RECORD0','Updated_DataID1');
-        console.log(`Transaction has been evaluated, result is: ${result0.toString()}`);
-        const result1 = await contract.submitTransaction('update_data', 'RECORD1','Updated_DataID2');
-        console.log(`Transaction has been evaluated, result is: ${result1.toString()}`);
+        const result=await contract.submitTransaction('createCar', 'x509::/OU=org1/OU=client/OU=department1/CN=appUser4::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server', 'Lab Report', 'DataID4');
+        console.log(`Transaction has been submitted, result is: ${result.toString()}`);
+        const result7=await contract.submitTransaction('createCar', 'x509::/OU=org1/OU=client/OU=department1/CN=appUser5::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server', 'Prescription', 'DataID5');
+        console.log(`Transaction has been submitted, result is: ${result7.toString()}`);
+        // const result0 = await contract.submitTransaction('update_data', 'RECORD0','Updated_DataID1');
+        // console.log(`Transaction has been evaluated, result is: ${result0.toString()}`);
+        // const result1 = await contract.submitTransaction('update_data', 'RECORD1','Updated_DataID2');
+        // console.log(`Transaction has been evaluated, result is: ${result1.toString()}`);
         
 
         // Disconnect from the gateway.
