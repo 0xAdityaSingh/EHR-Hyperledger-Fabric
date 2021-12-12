@@ -43,18 +43,18 @@ async function main() {
         // Evaluate the specified transaction.
         // queryCar transaction - requires 1 argument, ex: ('queryCar', 'CAR4')
         // queryAllCars transaction - requires no arguments, ex: ('queryAllCars')
-        const result = await contract.evaluateTransaction('queryAll');
-        console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
+        // const result = await contract.evaluateTransaction('queryAll');
+        // console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
         // const result1 = await contract.evaluateTransaction('read_record', 'RECORD1');
         // console.log(`Transaction has been evaluated, result is: ${result1.toString()}`);
         // const result2 = await contract.evaluateTransaction('read_record', 'RECORD2');
         // console.log(`Transaction has been evaluated, result is: ${result2.toString()}`);
         // const result8 = await contract.evaluateTransaction('read_record', 'RECORD0');
         // console.log(`Transaction has been evaluated, result is: ${result8.toString()}`);
-        // const result = await contract.evaluateTransaction('queryAll');
+        // const result = await contract.evaluateTransaction('queryAllbyOwner');
         // console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
-        // const result1 = await contract.evaluateTransaction('queryAll','Doctor');
-        // console.log(`Transaction has been evaluated, result is: ${result1.toString()}`);
+        const result1 = await contract.evaluateTransaction('queryAllbyOwner');
+        console.log(`Transaction has been evaluated, result is: ${result1.toString()}`);
         // const result2 = await contract.evaluateTransaction('queryAll','Diagnostic_lab');
         // console.log(`Transaction has been evaluated, result is: ${result2.toString()}`);
 

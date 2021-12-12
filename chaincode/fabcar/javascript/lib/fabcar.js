@@ -22,6 +22,20 @@ class FabCar extends Contract {
             },
             {
                 
+                owner: 'x509::/OU=org1/OU=client/OU=department1/CN=appUser::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server',
+                allowed: ['x509::/OU=org1/OU=client/OU=department1/CN=doctor1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server'],
+                type: 'Prescription',
+                data: 'DataID12',
+            },
+            {
+                
+                owner: 'x509::/OU=org1/OU=client/OU=department1/CN=appUser::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server',
+                allowed: ['x509::/OU=org1/OU=client/OU=department1/CN=doctor1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server', 'x509::/OU=org1/OU=client/OU=department1/CN=pharmacy1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server','x509::/OU=org1/OU=client/OU=department1/CN=insurance1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server'],
+                type: 'Lab Report',
+                data: 'DataID13',
+            },
+            {
+                
                 owner: 'x509::/OU=org1/OU=client/OU=department1/CN=appUser1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server',
                 allowed: ['x509::/OU=org1/OU=client/OU=department1/CN=doctor1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server','x509::/OU=org1/OU=client/OU=department1/CN=diagnostic_lab1::/C=US/ST=North Carolina/O=Hyperledger/OU=Fabric/CN=fabric-ca-server'],
                 type: 'Lab Report',
@@ -262,27 +276,36 @@ class FabCar extends Contract {
         console.info(allResults);
         return JSON.stringify(allResults);
     }
-    // async queryAll(ctx,role) {
-    //     const startKey = '';
-    //     const endKey = '';
-    //     const allResults = [];
-    //     for await (const {key, value} of ctx.stub.getStateByRange(startKey, endKey)) {
-    //         const strValue = Buffer.from(value).toString('utf8');
-    //         let record;
-    //         try {
-    //             record = JSON.parse(strValue);
-    //         } catch (err) {
-    //             console.log(err);
-    //             record = strValue;
-    //         }
-    //         if(record.role.toString()===role){
-    //             allResults.push({ Key: key, Record: record });
-    //         }
+    async queryAllbyOwner(ctx) {
+        const startKey = '';
+        const endKey = '';
+        const allResults = {};
+        for await (const {key, value} of ctx.stub.getStateByRange(startKey, endKey)) {
+            const strValue = Buffer.from(value).toString('utf8');
+            let record;
+            try {
+                record = JSON.parse(strValue);
+                if(allResults[record.owner]===undefined){
+                    var records =[];
+                    records.push(record);
+                    // allResults.push({ Key: record.owner, Record: records });
+                    allResults[record.owner]=records;
+                }
+                else{
+                    var records = allResults[record.owner];
+                    records.push(record);
+                    allResults[record.owner]=records;
+                }
+            } catch (err) {
+                console.log(err);
+                record = strValue;
+            }
             
-    //     }
-    //     console.info(allResults);
-    //     return JSON.stringify(allResults);
-    // }
+            
+        }
+        console.info(allResults);
+        return JSON.stringify(allResults);
+    }
     
 
 
