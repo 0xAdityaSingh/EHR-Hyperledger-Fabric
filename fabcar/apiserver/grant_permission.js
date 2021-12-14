@@ -51,6 +51,6 @@ app.get('/api/grant', async function (req, res)  {
         console.error(`Failed to submit transaction: ${error}`);
         process.exit(1);
     }
-}
+})
 
 main();

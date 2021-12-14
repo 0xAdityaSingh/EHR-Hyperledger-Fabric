@@ -51,7 +51,7 @@ const ccpPath = path.resolve(__dirname, '..', '..', 'test-network', 'organizatio
 });
 
 // https://c9addy.github.io/test-json/queryAllbyOwner.json
-app.get('/api/queryAllbyOwner', async function (req, res)  {
+app.post('/api/queryAllbyOwner', async function (req, res)  {
         try {
     const ccpPath = path.resolve(__dirname, '..', '..', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
             const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
@@ -255,7 +255,7 @@ app.post('/api/grant', async function (req, res)  {
         console.error(`Failed to submit transaction: ${error}`);
         process.exit(1);
     }
-}
+})
 
 app.post('/api/revoke', async function (req, res)  {
     // user-id, record-id, iser-id-2
@@ -299,6 +299,6 @@ app.post('/api/revoke', async function (req, res)  {
         console.error(`Failed to submit transaction: ${error}`);
         process.exit(1);
     }
-}
+})
 app.listen(8080);
 // npx nodemon api_query.js
