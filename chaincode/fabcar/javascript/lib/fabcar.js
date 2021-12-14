@@ -277,6 +277,9 @@ class FabCar extends Contract {
         return JSON.stringify(allResults);
     }
     async queryAllbyOwner(ctx) {
+        const role = await ctx.clientIdentity.getAttributeValue('hf.Registrar.Roles')
+        let role_str = role.toString();
+
         const startKey = '';
         const endKey = '';
         const allResults = {};
@@ -287,13 +290,63 @@ class FabCar extends Contract {
                 record = JSON.parse(strValue);
                 if(allResults[record.owner]===undefined){
                     var records =[];
-                    records.push(record);
-                    // allResults.push({ Key: record.owner, Record: records });
-                    allResults[record.owner]=records;
+                    if(role_str === 'patient'){
+                        if(record['owner']===ctx.clientIdentity.getID()){
+                            records.push(record);
+                        }
+                    }
+                    if(role_str === 'insurance'){
+                        if(record['allowed'].includes(ctx.clientIdentity.getID())) {
+                            records.push(record);
+                        }
+                    }
+                    if(role_str === 'doctor'){
+                        if(record['allowed'].includes(ctx.clientIdentity.getID())) {
+                            records.push(record);
+                        }
+                    }
+                    if(role_str === 'pharmacy'){
+                        if(record['type']==='Prescription' && record['allowed'].includes(ctx.clientIdentity.getID())) {
+                            records.push(record);
+                        }
+                    }
+                    if(role_str === 'diagnostic lab'){
+                        if(record['type']==='Lab Report' && record['allowed'].includes(ctx.clientIdentity.getID())){
+                            records.push(record);
+                        }
+                    }
+                    if(records.length!=0) {
+                        allResults[record.owner]=records;
+                    }
                 }
                 else{
                     var records = allResults[record.owner];
-                    records.push(record);
+                    if(role_str === 'patient'){
+                        if(record['owner']===ctx.clientIdentity.getID()){
+                            records.push(record);
+                        }
+                    }
+                    if(role_str === 'insurance'){
+                        if(record['allowed'].includes(ctx.clientIdentity.getID())) {
+                            records.push(record);
+                        }
+                    }
+                    if(role_str === 'doctor'){
+                        if(record['allowed'].includes(ctx.clientIdentity.getID())) {
+                            records.push(record);
+                        }
+                    }
+                    if(role_str === 'pharmacy'){
+                        if(record['type']==='Prescription' && record['allowed'].includes(ctx.clientIdentity.getID())) {
+                            records.push(record);
+                        }
+                    }
+                    if(role_str === 'diagnostic lab'){
+                        if(record['type']==='Lab Report' && record['allowed'].includes(ctx.clientIdentity.getID())){
+                            records.push(record);
+                        }
+                    }
+
                     allResults[record.owner]=records;
                 }
             } catch (err) {

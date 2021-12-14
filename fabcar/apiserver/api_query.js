@@ -61,7 +61,7 @@ app.get('/api/queryAllbyOwner', async function (req, res)  {
             console.log(`Wallet path: ${walletPath}`);
     
             // Check to see if we've already enrolled the user.
-            const identity = await wallet.get('appUser');
+            const identity = await wallet.get(req.body.userId);
             if (!identity) {
                 console.log('An identity for the user "appUser" does not exist in the wallet');
                 console.log('Run the registerUser.js application before retrying');
@@ -69,7 +69,7 @@ app.get('/api/queryAllbyOwner', async function (req, res)  {
             }
       // Create a new gateway for connecting to our peer node.
             const gateway = new Gateway();
-            await gateway.connect(ccp, { wallet, identity: 'appUser', discovery: { enabled: true, asLocalhost: true } });
+            await gateway.connect(ccp, { wallet, identity: req.body.userId, discovery: { enabled: true, asLocalhost: true } });
     
             // Get the network (channel) our contract is deployed to.
             const network = await gateway.getNetwork('mychannel');
@@ -213,5 +213,92 @@ const ccpPath = path.resolve(__dirname, '..', '..', 'test-network', 'organizatio
     } 
 })
 
+app.post('/api/grant', async function (req, res)  {
+    // user-id, record-id, iser-id-2
+    try {
+        // load the network configuration
+        const ccpPath = path.resolve(__dirname, '..', '..', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
+        let ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
+
+        // Create a new file system based wallet for managing identities.
+        const walletPath = path.join(process.cwd(), 'wallet');
+        const wallet = await Wallets.newFileSystemWallet(walletPath);
+        console.log(`Wallet path: ${walletPath}`);
+
+        // Check to see if we've already enrolled the user.
+        const identity = await wallet.get(req.body.userId);
+        if (!identity) {
+            console.log('An identity for the user "appUser" does not exist in the wallet');
+            console.log('Run the registerUser.js application before retrying');
+            return;
+        }
+
+        // Create a new gateway for connecting to our peer node.
+        const gateway = new Gateway();
+        await gateway.connect(ccp, { wallet, identity: req.body.userId, discovery: { enabled: true, asLocalhost: true } });
+
+        // Get the network (channel) our contract is deployed to.
+        const network = await gateway.getNetwork('mychannel');
+
+        // Get the contract from the network.
+        const contract = network.getContract('fabcar');
+
+        
+        const result3 = await contract.submitTransaction('grant_permission', req.body.recordId,req.body.userId2);
+        console.log(`Transaction has been evaluated, result is: ${result3.toString()}`);
+        res.status(200).json({response: JSON.parse(result3.toString('utf8'))});
+
+        // Disconnect from the gateway.
+        await gateway.disconnect();
+
+    } catch (error) {
+        console.error(`Failed to submit transaction: ${error}`);
+        process.exit(1);
+    }
+}
+
+app.post('/api/revoke', async function (req, res)  {
+    // user-id, record-id, iser-id-2
+    try {
+        // load the network configuration
+        const ccpPath = path.resolve(__dirname, '..', '..', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
+        let ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
+
+        // Create a new file system based wallet for managing identities.
+        const walletPath = path.join(process.cwd(), 'wallet');
+        const wallet = await Wallets.newFileSystemWallet(walletPath);
+        console.log(`Wallet path: ${walletPath}`);
+
+        // Check to see if we've already enrolled the user.
+        const identity = await wallet.get(req.body.userId);
+        if (!identity) {
+            console.log('An identity for the user "appUser" does not exist in the wallet');
+            console.log('Run the registerUser.js application before retrying');
+            return;
+        }
+
+        // Create a new gateway for connecting to our peer node.
+        const gateway = new Gateway();
+        await gateway.connect(ccp, { wallet, identity: req.body.userId, discovery: { enabled: true, asLocalhost: true } });
+
+        // Get the network (channel) our contract is deployed to.
+        const network = await gateway.getNetwork('mychannel');
+
+        // Get the contract from the network.
+        const contract = network.getContract('fabcar');
+
+        
+        const result3 = await contract.submitTransaction('revoke_permission', req.body.recordId,req.body.userId2);
+        console.log(`Transaction has been evaluated, result is: ${result3.toString()}`);
+        res.status(200).json({response: JSON.parse(result3.toString('utf8'))});
+
+        // Disconnect from the gateway.
+        await gateway.disconnect();
+
+    } catch (error) {
+        console.error(`Failed to submit transaction: ${error}`);
+        process.exit(1);
+    }
+}
 app.listen(8080);
 // npx nodemon api_query.js
