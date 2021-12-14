@@ -1,11 +1,20 @@
+
+'use strict';
+
+// const { Wallets } = require('fabric-network');
+const FabricCAServices = require('fabric-ca-client');
+const fs = require('fs');
+const path = require('path');
+
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
 app.use(bodyParser.json());
 // Setting for Hyperledger Fabric
 const { Gateway,Wallets } = require('fabric-network');
-const path = require('path');
-const fs = require('fs');
+// const path = require('path');
+// const fs = require('fs');
 //const ccpPath = path.resolve(__dirname, '..', '..', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
   //      const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
 
@@ -246,7 +255,7 @@ app.post('/api/grant', async function (req, res)  {
         
         const result3 = await contract.submitTransaction('grant_permission', req.body.recordId,req.body.userId2);
         console.log(`Transaction has been evaluated, result is: ${result3.toString()}`);
-        res.status(200).json({response: JSON.parse(result3.toString('utf8'))});
+        res.status(200).json({response: JSON.stringify(result3.toString('utf8'))});
 
         // Disconnect from the gateway.
         await gateway.disconnect();
@@ -290,7 +299,7 @@ app.post('/api/revoke', async function (req, res)  {
         
         const result3 = await contract.submitTransaction('revoke_permission', req.body.recordId,req.body.userId2);
         console.log(`Transaction has been evaluated, result is: ${result3.toString()}`);
-        res.status(200).json({response: JSON.parse(result3.toString('utf8'))});
+        res.status(200).json({response: JSON.stringify(result3.toString('utf8'))});
 
         // Disconnect from the gateway.
         await gateway.disconnect();
@@ -348,7 +357,7 @@ app.post('/api/register', async function (req, res)  {
             ],
         }, adminUser);
         const enrollment = await ca.enroll({
-            enrollmentID: 'doctor1',
+            enrollmentID: req.body.userId2,
             enrollmentSecret: secret,
             attr_reqs: [{name: 'hf.Registrar.Roles', optional: false}]
         });
@@ -365,10 +374,10 @@ app.post('/api/register', async function (req, res)  {
         console.log(x509Identity)
 
     } catch (error) {
-        console.error(`Failed to register user "doctor1": ${error}`);
+        console.error(`Failed to register user ${req.body.userId2}: ${error}`);
         process.exit(1);
     }
-}
+})
 
 
 app.listen(8080);

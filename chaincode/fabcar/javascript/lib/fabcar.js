@@ -292,27 +292,27 @@ class FabCar extends Contract {
                     var records =[];
                     if(role_str === 'patient'){
                         if(record['owner']===ctx.clientIdentity.getID()){
-                            records.push(record);
+                            records.push([key,record]);
                         }
                     }
                     if(role_str === 'insurance'){
                         if(record['allowed'].includes(ctx.clientIdentity.getID())) {
-                            records.push(record);
+                            records.push([key,record]);
                         }
                     }
                     if(role_str === 'doctor'){
                         if(record['allowed'].includes(ctx.clientIdentity.getID())) {
-                            records.push(record);
+                            records.push([key,record]);
                         }
                     }
                     if(role_str === 'pharmacy'){
                         if(record['type']==='Prescription' && record['allowed'].includes(ctx.clientIdentity.getID())) {
-                            records.push(record);
+                            records.push([key,record]);
                         }
                     }
                     if(role_str === 'diagnostic lab'){
                         if(record['type']==='Lab Report' && record['allowed'].includes(ctx.clientIdentity.getID())){
-                            records.push(record);
+                            records.push([key,record]);
                         }
                     }
                     if(records.length!=0) {
@@ -323,27 +323,27 @@ class FabCar extends Contract {
                     var records = allResults[record.owner];
                     if(role_str === 'patient'){
                         if(record['owner']===ctx.clientIdentity.getID()){
-                            records.push(record);
+                            records.push([key,record]);
                         }
                     }
                     if(role_str === 'insurance'){
                         if(record['allowed'].includes(ctx.clientIdentity.getID())) {
-                            records.push(record);
+                            records.push([key,record]);
                         }
                     }
                     if(role_str === 'doctor'){
                         if(record['allowed'].includes(ctx.clientIdentity.getID())) {
-                            records.push(record);
+                            records.push([key,record]);
                         }
                     }
                     if(role_str === 'pharmacy'){
                         if(record['type']==='Prescription' && record['allowed'].includes(ctx.clientIdentity.getID())) {
-                            records.push(record);
+                            records.push([key,record]);
                         }
                     }
                     if(role_str === 'diagnostic lab'){
                         if(record['type']==='Lab Report' && record['allowed'].includes(ctx.clientIdentity.getID())){
-                            records.push(record);
+                            records.push([key,record]);
                         }
                     }
 
